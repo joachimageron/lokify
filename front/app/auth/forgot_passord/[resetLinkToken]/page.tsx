@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import {Button, Input, Link, Form} from "@heroui/react";
+import {Button, Input, Link, Form, addToast} from "@heroui/react";
 
 export default function Page() {
   const [loading, setLoading] = React.useState(false);
@@ -29,6 +29,11 @@ export default function Page() {
     }
 
     // TODO: Implement reset password logic
+    addToast({
+      title: "Password reset",
+      description: "Your password has been reset successfully.",
+      color: "success",
+    });
     setLoading(false);
   };
 
@@ -65,8 +70,8 @@ export default function Page() {
 
         <p className="text-center text-small">
           Changed your mind?&nbsp;
-          <Link href="/auth/login" size="sm">
-            Go back to login
+          <Link href="/auth/signin" size="sm">
+            Go back to signin
           </Link>
         </p>
       </div>

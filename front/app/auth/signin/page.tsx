@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import {Button, Input, Link, Form, Divider} from "@heroui/react";
+import {Button, Input, Link, Form, Divider, Checkbox} from "@heroui/react";
 import {Icon} from "@iconify/react";
 
 export default function Page() {
@@ -65,14 +65,14 @@ export default function Page() {
             type={isVisible ? "text" : "password"}
             variant="bordered"
           />
-          {/*<div className="flex w-full items-center justify-between px-1 py-2">*/}
-            {/*<Checkbox name="remember" size="sm">*/}
-            {/*  Remember me*/}
-            {/*</Checkbox>*/}
-            {/*<Link className="text-default-500" href="#" size="sm">*/}
-            {/*  Forgot password?*/}
-            {/*</Link>*/}
-          {/*</div>*/}
+           <div className="flex w-full items-center justify-between px-1 py-2">
+            <Checkbox name="remember" size="sm">
+              Remember me
+            </Checkbox>
+            <Link className="text-default-500" href="/auth/forgot_passord" size="sm">
+              Forgot password?
+            </Link>
+          </div> 
           <Button isLoading={loading} className="w-full" color="primary" type="submit">
             Sign In
           </Button>
