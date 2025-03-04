@@ -12,7 +12,7 @@
       "name": "Express Server: debug",
       "type": "node-terminal",
       "request": "launch",
-      "command": "nodemon server.js", 
+      "command": "pnpm dev", 
       "cwd": "${workspaceFolder}/api"
     }
   ]
