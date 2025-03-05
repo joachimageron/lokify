@@ -2,4 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-
+.bg-home-img {
+  background-image: url("/images/bg-home.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
