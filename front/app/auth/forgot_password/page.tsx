@@ -28,7 +28,7 @@ export default function Page() {
   return (
     <main className="flex flex-col items-center justify-center py-[105px] px-4 min-h-screen bg-home-img">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col">
           <h1 className="text-large font-medium">Vous avez oublié votre mot de passe ?</h1>
           <p className="text-small text-default-500">Ca peut arriver, pas de problème ! Saisissez ici votre adresse mail et nous vous envoyons un lien pour le réinitialiser.</p>
         </div>

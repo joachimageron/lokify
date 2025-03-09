@@ -1,30 +1,29 @@
 "use client";
 
 import React from "react";
-import {Button, Input, Link, Form} from "@heroui/react";
+import {Button, Input, Form} from "@heroui/react";
 import {Icon} from "@iconify/react";
 
 export default function Page() {
   const [isVisible, setIsVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  
+
   const [password, setPassword] = React.useState<string>("");
   const [confirmPassword, setConfirmPassword] = React.useState<string>("");
   const errorPassword: string[] = [];
   let errorConfirmPassword: string | null = null;
-  
+
   const toggleVisibility = () => setIsVisible(!isVisible);
-  
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    // TODO: Implement registration logic
-    setLoading(false);
+
+    const data = new FormData(event.currentTarget);
   };
 
-
-  // Defining password's error messages structure
-  const errorMessages = () => {
+   // Defining password's error messages structure
+   const errorMessages = () => {
     return (
       <ul>
         {errorPassword.map((error, i) => (
@@ -61,15 +60,14 @@ export default function Page() {
     <main className="flex flex-col items-center justify-center py-[105px] px-4 min-h-screen bg-home-img">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">
         <div className="flex flex-col">
-          <h1 className="text-large font-medium">Créez-vous un compte</h1>
-          <p className="text-small text-default-500">pour utiliser les services de Lockify</p>
+          <h1 className="text-large font-medium">Choisissez votre nouveau mot de passe</h1>
+          <p className="text-small text-default-500">qu'il faudra désormais utiliser pour vous connecter à votre compte.</p>
         </div>
 
         <Form className="flex flex-col gap-3" validationBehavior="native" onSubmit={handleSubmit}>
-          <Input isRequired label="Adresse mail" name="email" placeholder="Entrez votre adresse mail" type="email" variant="bordered"/>
           <Input value={password} onValueChange={setPassword} isRequired label="Mot de passe" name="password" placeholder="Entrez votre mot de passe"
-             type={isVisible ? "text" : "password"} variant="bordered" isInvalid={errorPassword.length > 0} errorMessage={() => errorMessages()}
-             endContent={
+              type={isVisible ? "text" : "password"} variant="bordered" isInvalid={errorPassword.length > 0} errorMessage={() => errorMessages()}
+              endContent={
               <button type="button" onClick={toggleVisibility}>
                 {isVisible ? (
                   <Icon className="pointer-events-none text-xl text-default-400" icon="solar:eye-closed-linear"/>
@@ -93,25 +91,8 @@ export default function Page() {
               </button>
             }
           />
-          <Button isLoading={loading} className="w-full" color="primary" type="submit">Créer mon compte</Button>
+          <Button isLoading={loading} className="w-full" color="primary" type="submit">Valider ce nouveau mot de passe</Button>
         </Form>
-        {/* <div className="flex items-center gap-4 py-2">
-          <Divider className="flex-1"/>
-            <p className="shrink-0 text-tiny text-default-500">OU</p>
-          <Divider className="flex-1"/>
-        </div>
-        <div className="flex flex-col gap-2">
-          <Button startContent={<Icon icon="flat-color-icons:google" width={24}/>} variant="bordered" onPress={() => console.log("Google todo")}>
-            Me connecter avec Google
-          </Button>
-          <Button startContent={<Icon className="text-default-500" icon="fe:github" width={24}/>} variant="bordered" onPress={() => console.log("Github todo")}>
-            Me connecter avec Github
-          </Button>
-        </div> */}
-        <p className="text-center text-small">
-          Vous avez déja un compte ?<br></br>
-          <Link href="/auth/signin" size="sm">Je me connecte</Link>
-        </p>
       </div>
     </main>
   );

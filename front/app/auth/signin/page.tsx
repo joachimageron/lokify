@@ -56,7 +56,7 @@ export default function Page() {
           />
           <div className="flex w-full items-center justify-between px-1 py-2">
             <Checkbox name="remember" size="sm">Se souvenir de moi</Checkbox>
-            <Link className="text-blue-500" href="/auth/forgot_passord" size="sm">Mot de passe oublié ?</Link>
+            <Link className="text-blue-500" href="/auth/forgot_password" size="sm">Mot de passe oublié ?</Link>
           </div> 
           <Button isLoading={loading} className="w-full" color="primary" type="submit">Je me connecte</Button>
         </Form>
