@@ -37,6 +37,7 @@ export default function Page() {
     setLoading(false);
   };
 
+  // Defining page's content
   return (
     <div className="flex h-[90vh] w-full items-center justify-center">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">

@@ -1,6 +1,7 @@
 "use client";
 import { HeroUIProvider, ToastProvider } from "@heroui/react";
 
+// Defining providers to enable all pages to use notifications (toast)
 export const Providers = ({
   children,
 }: Readonly<{ children: React.ReactNode }>) => {
