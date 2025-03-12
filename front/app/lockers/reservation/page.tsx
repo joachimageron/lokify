@@ -62,19 +62,27 @@ export default function ReservationPage() {
     }, 0);
 
     return (
-    <main className="flex flex-col items-center py-[105px] px-[150px] min-h-screen bg-home-img">
-        <div className="flex w-full flex-col gap-4 rounded-large bg-content1 px-8 py-6">
+    <main className="flex flex-col items-center py-[105px] px-[20px] md:px-[150px] min-h-screen bg-home-img">
+        <div className="flex w-full flex-col gap-4 rounded-large bg-content1 px-4 md:px-8  py-6">
             <h1 className="text-4xl font-bold text-gray-900 mb-4">Choix de vos casiers</h1>
+            <p className="text-lg text-gray-700 mb-4">
+                Nos casiers actuellement disponibles sont en bleu et ceux déja loués en rouge. 
+                Vous pouvez choisir un ou plusieurs casiers en cliquant dessus, ceux-ci passeront alors en jaune.<br></br>
+                Une fois sélectionnés, leurs détails apparaîtront en bas de l'écran, où vous pourrez choisir 
+                votre durée de réservation et consulter le prix total. Vous pouvez réserver des casiers pour une durée maximale d'une semaine.
+            
+            </p>
             <div className="overflow-x-auto">
-                <div className="grid grid-rows-3 w-fit" style={{ gridAutoFlow: "column dense" }}>
+                <div className="grid grid-rows-3 w-fit md:px-3 py-1" style={{ gridAutoFlow: "column dense" }}>
                     {lockersData.map((locker) => (
                         <motion.button key={locker.id}
-                            className={`flex flex-col justify-center items-center p-4 border text-white font-bold cursor-pointer transition w-[125px] ${locker.occupied ? "bg-red-500 cursor-not-allowed" : selectedLockers.includes(locker.id) ? "bg-yellow-500" : "bg-blue-500 hover:bg-blue-600"}`}
+                            className={`relative flex flex-col justify-center items-center p-4 border text-white font-bold cursor-pointer transition w-[125px] min-h-[100px] rounded-[4px] ${locker.occupied ? "bg-red-500 pointer-events-none" : selectedLockers.includes(locker.id) ? "bg-yellow-500" : "bg-blue-500 hover:bg-blue-600"}`}
                             style={{ gridRow: `span ${locker.size}` }} 
                             onClick={() => !locker.occupied && toggleLockerSelection(locker.id)}
                         >
-                            <span className="text-xl">🔒</span>
-                            Casier {locker.id}
+                            <span className="absolute top-[8px] px-[12px] bg-white text-gray-800 negative-shadow">{locker.id}</span>
+                            <span className="locker-emoji text-xl absolute left-[10px] top-[50%] translate-y-[-50%]">🔒</span>
+                            <span className="locker-decoration absolute left-[50%] bottom-[20px] translate-x-[-50%] w-[45%] h-[2px] bg-gray-300 rounded"></span>
                         </motion.button>
                     ))}
                 </div>
