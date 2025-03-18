@@ -1,25 +1,55 @@
 "use client";
 
-import React from "react";
-import {Button, Input, Link, Form, Divider} from "@heroui/react";
-import {Icon} from "@iconify/react";
+import { useState, FormEvent } from "react";
+import { Button, Input, Link, Form, Divider, addToast } from "@heroui/react";
+import { Icon } from "@iconify/react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/components/providers/AuthProvider";
 
 export default function Page() {
-  const [isVisible, setIsVisible] = React.useState(false);
-  const [loading, setLoading] = React.useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const router = useRouter();
+  const { register, isLoading: authLoading } = useAuth();
   
-  const [password, setPassword] = React.useState<string>("");
-  const [confirmPassword, setConfirmPassword] = React.useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>("");
+  
   const errorPassword: string[] = [];
   let errorConfirmPassword: string | null = null;
   
   const toggleVisibility = () => setIsVisible(!isVisible);
   
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setLoading(true);
-    // TODO: Implement registration logic
-    setLoading(false);
+    
+    if (password !== confirmPassword) {
+      setLoading(false);
+      return;
+    }
+    
+    // Vérifiez que le mot de passe est suffisamment fort
+    if (errorPassword.length > 0) {
+      setLoading(false);
+      return;
+    }
+    
+    try {
+      await register({
+        email,
+        password
+      });
+      
+      // Redirection après l'inscription réussie
+      router.push("/auth/signin");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      // Les toasts d'erreur sont déjà gérés dans le provider
+    } finally {
+      setLoading(false);
+    }
   };
   
   const errorMessages = () => {
@@ -36,12 +66,12 @@ export default function Page() {
     if (password.length < 4) {
       errorPassword.push("Password must be 4 characters or more.");
     }
-    if ((password.match(/[A-Z]/g) || []).length < 1) {
-      errorPassword.push("Password must include at least 1 upper case letter");
-    }
-    if ((password.match(/[^a-z0-9]/gi) || []).length < 1) {
-      errorPassword.push("Password must include at least 1 symbol.");
-    }
+    // if ((password.match(/[A-Z]/g) || []).length < 1) {
+    //   errorPassword.push("Password must include at least 1 upper case letter");
+    // }
+    // if ((password.match(/[^a-z0-9]/gi) || []).length < 1) {
+    //   errorPassword.push("Password must include at least 1 symbol.");
+    // }
     if (password !== confirmPassword) {
       errorConfirmPassword = "Passwords do not match.";
     }
@@ -56,14 +86,6 @@ export default function Page() {
         </div>
         
         <Form className="flex flex-col gap-3" validationBehavior="native" onSubmit={handleSubmit}>
-          <Input
-            isRequired
-            label={"Username"}
-            name={"username"}
-            placeholder={"Enter your username"}
-            type={"text"}
-            variant={"bordered"}
-          />
           
           <Input
             isRequired
@@ -72,6 +94,8 @@ export default function Page() {
             placeholder="Enter your email"
             type="email"
             variant="bordered"
+            value={email}
+            onValueChange={setEmail}
           />
           <Input
             value={password}
@@ -127,16 +151,18 @@ export default function Page() {
             isInvalid={!!errorConfirmPassword}
             errorMessage={errorConfirmPassword}
           />
-          {/*<div className="flex w-full items-center justify-between px-1 py-2">*/}
-          {/*  <Checkbox name="remember" size="sm">*/}
-          {/*    Remember me*/}
-          {/*  </Checkbox>*/}
-          {/*</div>*/}
-          <Button isLoading={loading} className="w-full" color="primary" type="submit">
+          
+          <Button 
+            isLoading={loading || authLoading} 
+            className="w-full" 
+            color="primary" 
+            type="submit"
+            disabled={errorPassword.length > 0 || !!errorConfirmPassword}
+          >
             Register
           </Button>
         </Form>
-        <div className="flex items-center gap-4 py-2">
+        {/* <div className="flex items-center gap-4 py-2">
           <Divider className="flex-1"/>
           <p className="shrink-0 text-tiny text-default-500">OR</p>
           <Divider className="flex-1"/>
@@ -156,7 +182,7 @@ export default function Page() {
           >
             Continue with Github
           </Button>
-        </div>
+        </div> */}
         <p className="text-center text-small">
           Already an account ?&nbsp;
           <Link href="/auth/signin" size="sm">

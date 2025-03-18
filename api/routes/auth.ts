@@ -1,13 +1,11 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import User, { IUser } from "../models/User";
-import { auth } from "../middleware/auth";
-import bycrypt from "bcryptjs";
+import User from "../models/User";
 
 const router = express.Router();
 
 // Register a new user
-router.post("/register", async (req: Request, res: Response) => {
+router.post("/register", async (req: Request, res: Response): Promise<any>=> {
   try {
     const { email, password } = req.body;
     
@@ -29,6 +27,13 @@ router.post("/register", async (req: Request, res: Response) => {
     
     const token = jwt.sign({ userId: user.id }, secret, { expiresIn: "24h" });
     
+    res.cookie('token', token, {
+      httpOnly: true, // Pour empêcher l'accès JavaScript côté client
+      secure: process.env.NODE_ENV === 'production', // Uniquement sur HTTPS en production
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 24 heures
+    });
+
     res.status(201).json({ token });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
@@ -36,7 +41,7 @@ router.post("/register", async (req: Request, res: Response) => {
 });
 
 // Login user
-router.post("/login", async (req: Request, res: Response) => {
+router.post("/login", async (req: Request, res: Response): Promise<any> => {
   try {
     const { email, password } = req.body;
     
@@ -52,7 +57,7 @@ router.post("/login", async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Invalid credentials" });
     }
     
-    // Create and send JWT token
+    // Create JWT token
     const secret = process.env.JWT_SECRET;
     if (!secret) {
       return res.status(500).json({ message: "Server configuration error" });
@@ -60,11 +65,54 @@ router.post("/login", async (req: Request, res: Response) => {
     
     const token = jwt.sign({ userId: user.id }, secret, { expiresIn: "24h" });
     
-    res.json({ user: email, token });
+    // Set cookie with token
+    res.cookie('token', token, {
+      httpOnly: true, // Pour empêcher l'accès JavaScript côté client
+      secure: process.env.NODE_ENV === 'production', // Uniquement sur HTTPS en production
+      sameSite: 'strict',
+      maxAge: 24 * 60 * 60 * 1000, // 24 heures
+    });
+    
+    res.json({ 
+      success: true, 
+    });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
   }
 });
 
+router.post("/logout", (req: Request, res: Response) => {
+  res.clearCookie('token');
+  res.json({ success: true, message: "Logged out successfully" });
+});
+
+router.get("/me", async (req: Request, res: Response): Promise<any> => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: "Server configuration error" });
+    }
+    
+    const decoded = jwt.verify(token, secret) as { userId: string };
+    
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    res.json({ 
+        id: user._id,
+        email: user.email
+    });
+  } catch (error) {
+    res.status(401).json({ message: "Not authenticated" });
+  }
+}
+);
 
 export default router;

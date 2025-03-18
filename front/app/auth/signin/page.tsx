@@ -1,28 +1,19 @@
 "use client";
 
 import React from "react";
-import {Button, Input, Link, Form, Divider, Checkbox} from "@heroui/react";
-import {Icon} from "@iconify/react";
-import { useMutation } from "@tanstack/react-query";
-import { API_URL } from "@/utils/config";
+import { Button, Input, Link, Form, Divider, Checkbox, addToast } from "@heroui/react";
+import { Icon } from "@iconify/react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/app/components/providers/AuthProvider";
 
 export default function Page() {
   const [isVisible, setIsVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  const router = useRouter();
+  const {user, login, isLoading: authLoading} = useAuth();
   
-  // Create a mutation instead of a query (better for form submissions)
-  const mutation = useMutation({
-    mutationFn: async (credentials: { email: string, password: string }) => {
-      const response = await fetch(API_URL);
-      
-      if (!response.ok) {
-        throw new Error("An error occurred while signing in");
-      }
-      
-      return response.json();
-    }
-  });
-  
+  console.log("User:", user);
+
   const toggleVisibility = () => setIsVisible(!isVisible);
   
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -40,14 +31,15 @@ export default function Page() {
     }
     
     try {
-      // Call the mutation with form data
-      const data = await mutation.mutateAsync({ email, password });
-      console.log(data);
+      // Utilise la fonction login du contexte d'authentification
+      const loginData = await login({ email, password });
+      console.log("Login data:", loginData);
       
-      //TODO Implement sign in logic after successful response
+      // Redirection après la connexion réussie
+      // router.push("/dashboard"); // ou toute autre page après la connexion
     } catch (error) {
       console.error("Error during sign in:", error);
-      // Handle error
+      // Les toasts d'erreur sont déjà gérés dans le provider
     } finally {
       setLoading(false);
     }
@@ -93,19 +85,24 @@ export default function Page() {
             type={isVisible ? "text" : "password"}
             variant="bordered"
           />
-           <div className="flex w-full items-center justify-between px-1 py-2">
+          <div className="flex w-full items-center justify-between px-1 py-2">
             <Checkbox name="remember" size="sm">
               Remember me
             </Checkbox>
             <Link className="text-default-500" href="/auth/forgot_passord" size="sm">
               Forgot password?
             </Link>
-          </div> 
-          <Button isLoading={loading} className="w-full" color="primary" type="submit">
+          </div>
+          <Button 
+            isLoading={loading || authLoading} 
+            className="w-full" 
+            color="primary" 
+            type="submit"
+          >
             Sign In
           </Button>
         </Form>
-        <div className="flex items-center gap-4 py-2">
+        {/* <div className="flex items-center gap-4 py-2">
           <Divider className="flex-1" />
           <p className="shrink-0 text-tiny text-default-500">OR</p>
           <Divider className="flex-1" />
@@ -125,7 +122,7 @@ export default function Page() {
           >
             Continue with Github
           </Button>
-        </div>
+        </div> */}
         <p className="text-center text-small">
           Need to create an account ?&nbsp;
           <Link href="/auth/register" size="sm">

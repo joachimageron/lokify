@@ -1,6 +1,7 @@
 import express, { Application } from "express";
 import dotenv from "dotenv";
 import cors from "cors";
+import cookieParser from "cookie-parser";
 import connection from "./config/database";
 import lockersRouter from "./routes/lockers";
 import authRouter from "./routes/auth";
@@ -11,7 +12,11 @@ connection();
 const app: Application = express();
 
 app.use(express.json());
-app.use(cors());
+app.use(cookieParser()); // Ajoutez cette ligne pour gérer les cookies
+app.use(cors({
+  origin: process.env.CLIENT_URL || 'http://localhost:3000', // URL de votre front-end
+  credentials: true, // Permettre l'envoi de cookies
+}));
 
 app.use("/api/lockers", lockersRouter);
 app.use("/api/auth", authRouter);
