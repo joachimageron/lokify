@@ -3,10 +3,25 @@
 import React from "react";
 import {Button, Input, Link, Form, Divider, Checkbox} from "@heroui/react";
 import {Icon} from "@iconify/react";
+import { useMutation } from "@tanstack/react-query";
+import { API_URL } from "@/utils/config";
 
 export default function Page() {
   const [isVisible, setIsVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
+  
+  // Create a mutation instead of a query (better for form submissions)
+  const mutation = useMutation({
+    mutationFn: async (credentials: { email: string, password: string }) => {
+      const response = await fetch(API_URL);
+      
+      if (!response.ok) {
+        throw new Error("An error occurred while signing in");
+      }
+      
+      return response.json();
+    }
+  });
   
   const toggleVisibility = () => setIsVisible(!isVisible);
   
@@ -14,15 +29,28 @@ export default function Page() {
     event.preventDefault();
     setLoading(true);
     
-    const data = new FormData(event.currentTarget);
+    const formData = new FormData(event.currentTarget);
     
-    const email = data.get("email");
-    const password = data.get("password");
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
     
-    if (!email || !password) return;
+    if (!email || !password) {
+      setLoading(false);
+      return;
+    }
     
-    //TODO Implement sign in logic
-    setLoading(false);
+    try {
+      // Call the mutation with form data
+      const data = await mutation.mutateAsync({ email, password });
+      console.log(data);
+      
+      //TODO Implement sign in logic after successful response
+    } catch (error) {
+      console.error("Error during sign in:", error);
+      // Handle error
+    } finally {
+      setLoading(false);
+    }
   };
   
   return (
