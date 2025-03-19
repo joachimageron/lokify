@@ -2,11 +2,10 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import MailgunClient from '../utils/mailgunClient';
-import Mailgun from "mailgun.js";
 
-const router = express.Router();
+  const router = express.Router();
 
-// Register a new user
+  // Register a new user
 router.post("/register", async (req: Request, res: Response): Promise<any>=> {
   try {
     const { email, password } = req.body;
@@ -39,21 +38,23 @@ router.post("/register", async (req: Request, res: Response): Promise<any>=> {
     // Send welcome email
     try {
       const mailgunClient = MailgunClient.getInstance();
-      const dashboardUrl = `${process.env.CLIENT_URL}/dashboard`;
+      const verificationSecret = process.env.JWT_SECRET + user.password;
+      const verificationToken = jwt.sign({ userId: user.id }, verificationSecret, { expiresIn: "7d" });
+      const verificationUrl = `${process.env.CLIENT_URL}/auth/verify-email/${verificationToken}`;
       
       await mailgunClient.sendEmailWithTemplate(
         [user.email],
-        'Welcome to Lokify',
-        'welcome',
+        'Please Verify Your Email',
+        'email-confirmation',
         {
+          confirmUrl: verificationUrl,
           email: user.email,
-          dashboardUrl,
           currentYear: new Date().getFullYear()
         }
       );
     } catch (emailError) {
       // Log email error but don't fail registration
-      console.error("Failed to send welcome email:", emailError);
+      console.error("Failed to send verification email:", emailError);
     }
 
     res.status(201).json({ token });
@@ -131,7 +132,8 @@ router.get("/me", async (req: Request, res: Response): Promise<any> => {
     
     res.json({ 
         id: user._id,
-        email: user.email
+        email: user.email,
+        emailVerified: user.emailVerified
     });
   } catch (error) {
     res.status(401).json({ message: "Not authenticated" });
@@ -237,6 +239,105 @@ router.post("/reset-password/:token", async (req: Request, res: Response): Promi
   } catch (error) {
     console.error("Password reset error:", error);
     res.status(500).json({ message: "An error occurred during the password reset process" });
+  }
+});
+
+// Send verification email
+router.post("/send-verification-email", async (req: Request, res: Response): Promise<any> => {
+  try {
+    const token = req.cookies.token;
+    if (!token) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      return res.status(500).json({ message: "Server configuration error" });
+    }
+    
+    const decoded = jwt.verify(token, secret) as { userId: string };
+    
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(401).json({ message: "Not authenticated" });
+    }
+    
+    // If already verified, no need to send
+    if (user.emailVerified) {
+      return res.json({ message: "Email already verified" });
+    }
+    
+    // Create a verification token (similar to reset password)
+    const verificationSecret = process.env.JWT_SECRET + user.password;
+    const verificationToken = jwt.sign({ userId: user.id }, verificationSecret, { expiresIn: "7d" });
+    
+    // Create verification URL
+    const verificationUrl = `${process.env.CLIENT_URL}/auth/verify-email/${verificationToken}`;
+    
+    // Send the verification email
+    const mailgunClient = MailgunClient.getInstance();
+    
+    await mailgunClient.sendEmailWithTemplate(
+      [user.email],
+      'Please Verify Your Email',
+      'email-confirmation',
+      {
+        confirmUrl: verificationUrl,
+        email: user.email,
+        currentYear: new Date().getFullYear()
+      }
+    );
+    
+    res.json({ message: "Verification email sent successfully" });
+  } catch (error) {
+    console.error("Email verification error:", error);
+    res.status(500).json({ message: "An error occurred during email verification" });
+  }
+});
+
+// Verify email with token
+router.get("/verify-email/:token", async (req: Request, res: Response): Promise<any> => {
+  try {
+    const { token } = req.params;
+    
+    if (!token) {
+      return res.status(400).json({ message: "Missing verification token" });
+    }
+    
+    // Decode token to get user ID (without verification yet)
+    const decoded = jwt.decode(token) as { userId: string };
+    if (!decoded || !decoded.userId) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+    
+    // Find user
+    const user = await User.findById(decoded.userId);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    
+    // If already verified
+    if (user.emailVerified) {
+      return res.json({ message: "Email already verified" });
+    }
+    
+    // Verify token with user-specific secret
+    const secret = process.env.JWT_SECRET + user.password;
+    try {
+      jwt.verify(token, secret);
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid or expired verification token" });
+    }
+    
+    // Mark email as verified
+    user.emailVerified = true;
+    await user.save();
+    
+    res.json({ message: "Email verified successfully" });
+    
+  } catch (error) {
+    console.error("Email verification error:", error);
+    res.status(500).json({ message: "An error occurred during email verification" });
   }
 });
 
