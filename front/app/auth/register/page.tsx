@@ -7,7 +7,8 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/providers/AuthProvider";
 
 export default function Page() {
-  const [isVisible, setIsVisible] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const { register, isLoading: authLoading } = useAuth();
@@ -19,7 +20,8 @@ export default function Page() {
   const errorPassword: string[] = [];
   let errorConfirmPassword: string | null = null;
   
-  const toggleVisibility = () => setIsVisible(!isVisible);
+  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+  const toggleConfirmPasswordVisibility = () => setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
   
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -102,8 +104,8 @@ export default function Page() {
             onValueChange={setPassword}
             isRequired
             endContent={
-              <button type="button" onClick={toggleVisibility}>
-                {isVisible ? (
+              <button type="button" onClick={togglePasswordVisibility}>
+                {isPasswordVisible ? (
                   <Icon
                     className="pointer-events-none text-xl text-default-400"
                     icon="solar:eye-closed-linear"
@@ -119,7 +121,7 @@ export default function Page() {
             label="Password"
             name="password"
             placeholder="Enter your password"
-            type={isVisible ? "text" : "password"}
+            type={isPasswordVisible ? "text" : "password"}
             variant="bordered"
             isInvalid={errorPassword.length > 0}
             errorMessage={() => errorMessages()}
@@ -129,8 +131,8 @@ export default function Page() {
             onValueChange={setConfirmPassword}
             isRequired
             endContent={
-              <button type="button" onClick={toggleVisibility}>
-                {isVisible ? (
+              <button type="button" onClick={toggleConfirmPasswordVisibility}>
+                {isConfirmPasswordVisible ? (
                   <Icon
                     className="pointer-events-none text-xl text-default-400"
                     icon="solar:eye-closed-linear"
@@ -146,7 +148,7 @@ export default function Page() {
             label="Confirm Password"
             name="confirmPassword"
             placeholder="Enter your password"
-            type={isVisible ? "text" : "password"}
+            type={isConfirmPasswordVisible ? "text" : "password"}
             variant="bordered"
             isInvalid={!!errorConfirmPassword}
             errorMessage={errorConfirmPassword}

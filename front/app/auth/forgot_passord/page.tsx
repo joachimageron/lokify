@@ -1,27 +1,66 @@
 "use client";
 
 import React from "react";
-import {Button, Input, Link, Form, addToast} from "@heroui/react";
+import { Button, Input, Link, Form, addToast } from "@heroui/react";
+import { useMutation } from "@tanstack/react-query";
+import { API_URL } from "@/utils/config";
+
+// Function to call the forgot password API
+const forgotPassword = async (email: string) => {
+  const response = await fetch(`${API_URL}/api/auth/forgot-password`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ email }),
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to send reset link");
+  }
+
+  return response.json();
+};
 
 export default function Page() {
-  const [loading, setLoading] = React.useState(false);
+  // Use React Query mutation for state management
+  const forgotPasswordMutation = useMutation({
+    mutationFn: (email: string) => forgotPassword(email),
+    onSuccess: () => {
+      addToast({
+        title: "Password reset",
+        description: "If your email exists in our system, a reset link has been sent.",
+        color: "success",
+      });
+    },
+    onError: (error: Error) => {
+      addToast({
+        title: "Error",
+        description: error.message || "Failed to send reset link",
+        color: "danger",
+      });
+    },
+  });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setLoading(true);
 
     const data = new FormData(event.currentTarget);
-    const email = data.get("email");
+    const email = data.get("email") as string;
 
-    if (!email) return;
+    if (!email) {
+      addToast({
+        title: "Error",
+        description: "Please enter your email address",
+        color: "danger",
+      });
+      return;
+    }
 
-    // TODO: Implement forgot password logic
-    addToast({
-      title: "Password reset",
-      description: "A reset link has been sent to your email.",
-      color: "default"
-    });
-    setLoading(false);
+    // Trigger the mutation
+    forgotPasswordMutation.mutate(email);
   };
 
   return (
@@ -40,8 +79,14 @@ export default function Page() {
             placeholder="Enter your email"
             type="email"
             variant="bordered"
+            disabled={forgotPasswordMutation.isPending}
           />
-          <Button isLoading={loading} className="w-full" color="primary" type="submit">
+          <Button 
+            isLoading={forgotPasswordMutation.isPending} 
+            className="w-full" 
+            color="primary" 
+            type="submit"
+          >
             Send Reset Link
           </Button>
         </Form>

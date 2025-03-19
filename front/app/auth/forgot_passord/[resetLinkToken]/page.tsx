@@ -1,11 +1,65 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import {Button, Input, Link, Form, addToast} from "@heroui/react";
+import { useMutation } from "@tanstack/react-query";
+import { useParams, useRouter } from "next/navigation";
+import { API_URL } from "@/utils/config";
+import { Icon } from "@iconify/react";
+
+// Function to call the reset password API
+const resetPassword = async ({ token, password }: { token: string; password: string }) => {
+  const response = await fetch(`${API_URL}/api/auth/reset-password/${token}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ password }),
+    credentials: "include",
+  });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.message || "Failed to reset password");
+  }
+
+  return response.json();
+};
 
 export default function Page() {
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState<string | null>(null);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] = useState(false);
+  const params = useParams();
+  const router = useRouter();
+  const resetToken = params.resetLinkToken as string;
+
+  const togglePasswordVisibility = () => setIsPasswordVisible(!isPasswordVisible);
+  const toggleConfirmPasswordVisibility = () => setIsConfirmPasswordVisible(!isConfirmPasswordVisible);
+
+  // Use React Query mutation for state management
+  const resetPasswordMutation = useMutation({
+    mutationFn: (password: string) => resetPassword({ token: resetToken, password }),
+    onSuccess: () => {
+      addToast({
+        title: "Password reset",
+        description: "Your password has been reset successfully.",
+        color: "success",
+      });
+      
+      // Redirect to login page after successful password reset
+      setTimeout(() => {
+        router.push("/auth/signin");
+      }, 2000);
+    },
+    onError: (error: Error) => {
+      setError(error.message || "Failed to reset password. The link may be expired or invalid.");
+    },
+    onSettled: () => {
+      setLoading(false);
+    }
+  });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -28,13 +82,8 @@ export default function Page() {
       return;
     }
 
-    // TODO: Implement reset password logic
-    addToast({
-      title: "Password reset",
-      description: "Your password has been reset successfully.",
-      color: "success",
-    });
-    setLoading(false);
+    // Call the mutation to reset the password
+    resetPasswordMutation.mutate(password as string);
   };
 
   return (
@@ -51,19 +100,49 @@ export default function Page() {
             label="New Password"
             name="password"
             placeholder="Enter your new password"
-            type="password"
+            type={isPasswordVisible ? "text" : "password"}
             variant="bordered"
+            endContent={
+              <button type="button" onClick={togglePasswordVisibility}>
+                {isPasswordVisible ? (
+                  <Icon
+                    className="pointer-events-none text-xl text-default-400"
+                    icon="solar:eye-closed-linear"
+                  />
+                ) : (
+                  <Icon
+                    className="pointer-events-none text-xl text-default-400"
+                    icon="solar:eye-bold"
+                  />
+                )}
+              </button>
+            }
           />
           <Input
             isRequired
             label="Confirm New Password"
             name="confirmPassword"
             placeholder="Confirm your new password"
-            type="password"
+            type={isConfirmPasswordVisible ? "text" : "password"}
             variant="bordered"
+            endContent={
+              <button type="button" onClick={toggleConfirmPasswordVisibility}>
+                {isConfirmPasswordVisible ? (
+                  <Icon
+                    className="pointer-events-none text-xl text-default-400"
+                    icon="solar:eye-closed-linear"
+                  />
+                ) : (
+                  <Icon
+                    className="pointer-events-none text-xl text-default-400"
+                    icon="solar:eye-bold"
+                  />
+                )}
+              </button>
+            }
           />
           {error && <p className="text-red-500">{error}</p>}
-          <Button isLoading={loading} className="w-full" color="primary" type="submit">
+          <Button isLoading={loading || resetPasswordMutation.isPending} className="w-full" color="primary" type="submit">
             Reset Password
           </Button>
         </Form>
