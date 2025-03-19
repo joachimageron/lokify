@@ -6,27 +6,40 @@ import connection from "./config/database";
 import lockersRouter from "./routes/lockers";
 import authRouter from "./routes/auth";
 import 'pretty-error/start';
+import fs from 'fs';
+import path from 'path';
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+// Load base environment variables first
+dotenv.config({ path: '.env' });
 
+// Then load NODE_ENV specific variables
 if (process.env.NODE_ENV) {
-  const envConfig = dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-  if (envConfig.error) {
-    console.warn(`Warning: .env.${process.env.NODE_ENV} file not found`);
+  const envNodePath = `.env.${process.env.NODE_ENV}`;
+  if (fs.existsSync(path.resolve(process.cwd(), envNodePath))) {
+    dotenv.config({ path: envNodePath });
+    console.log(`Loaded environment from ${envNodePath}`);
+  } else {
+    console.warn(`Warning: ${envNodePath} file not found`);
   }
+}
+
+// Finally, override with .env.local if it exists
+const localEnvPath = '.env.local';
+if (fs.existsSync(path.resolve(process.cwd(), localEnvPath))) {
+  dotenv.config({ path: localEnvPath });
+  console.log(`Loaded local environment overrides from ${localEnvPath}`);
 }
 
 connection();
 
 const app: Application = express();
 
-// // app.use(express.json());
-app.use(cookieParser()); // Ajoutez cette ligne pour gérer les cookies
+app.use(express.json()); // Uncommented this line for JSON parsing
+app.use(cookieParser());
 app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000', // URL de votre front-end
-  credentials: true, // Permettre l'envoi de cookies
+  origin: process.env.CLIENT_URL || 'http://localhost:3000',
+  credentials: true,
 }));
-
 
 app.use("/api/lockers", lockersRouter);
 app.use("/api/auth", authRouter);

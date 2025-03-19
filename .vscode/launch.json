@@ -9,7 +9,7 @@
       "cwd": "${workspaceFolder}/front"
     },
     {
-      "name": "Express Server: debug",
+      "name": "Express: debug",
       "type": "node-terminal",
       "request": "launch",
       "command": "pnpm dev", 

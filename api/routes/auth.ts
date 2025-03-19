@@ -36,6 +36,26 @@ router.post("/register", async (req: Request, res: Response): Promise<any>=> {
       maxAge: 24 * 60 * 60 * 1000, // 24 heures
     });
 
+    // Send welcome email
+    try {
+      const mailgunClient = MailgunClient.getInstance();
+      const dashboardUrl = `${process.env.CLIENT_URL}/dashboard`;
+      
+      await mailgunClient.sendEmailWithTemplate(
+        [user.email],
+        'Welcome to Lokify',
+        'welcome',
+        {
+          email: user.email,
+          dashboardUrl,
+          currentYear: new Date().getFullYear()
+        }
+      );
+    } catch (emailError) {
+      // Log email error but don't fail registration
+      console.error("Failed to send welcome email:", emailError);
+    }
+
     res.status(201).json({ token });
   } catch (error) {
     res.status(500).json({ error: (error as Error).message });
@@ -121,7 +141,6 @@ router.get("/me", async (req: Request, res: Response): Promise<any> => {
 
 // Forgot password (request reset link)
 router.post("/forgot-password", async (req: Request, res: Response): Promise<any> => {
-
   try {
     const { email } = req.body;
     
@@ -133,26 +152,30 @@ router.post("/forgot-password", async (req: Request, res: Response): Promise<any
     }
     
     // Create a reset token (different from auth token)
-    const secret = process.env.JWT_SECRET + user.password; // Add password to make token unique and invalidate if password changes
+    const secret = process.env.JWT_SECRET + user.password;
     if (!secret) {
       return res.status(500).json({ message: "Server configuration error" });
     }
     
-    const token = jwt.sign({ userId: user.id }, secret, { expiresIn: "15m" }); // Short expiry for security
-    console.log("Reset token:", token);
-    // Create reset URL
-    const resetUrl = `${process.env.CLIENT_URL}/auth/forgot_passord/${token}`;
+    const token = jwt.sign({ userId: user.id }, secret, { expiresIn: "15m" });
+    console.log("\x1b[36m","Reset token:", "\x1b[0m\x1b[33m", token, "\x1b[0m");
     
-    // Use the Mailgun singleton to send email
+    // Create reset URL
+    const resetUrl = `${process.env.CLIENT_URL}/auth/forgot_password/${token}`;
+
+    // Use the Mailgun singleton to send email with template
     const mailgunClient = MailgunClient.getInstance();
     
-    // TODO: Configure Mailgun to send email
-    // await mailgunClient.sendEmail(
-    //   [user.email],
-    //   'Password Reset Link',
-    //   `Please use the following link to reset your password: ${resetUrl}`,
-    //   `<p>Please use the following link to reset your password: <a href="${resetUrl}">${resetUrl}</a></p>`
-    // );
+    await mailgunClient.sendEmailWithTemplate(
+      [user.email],
+      'Password Reset Link',
+      'password-reset',
+      {
+        resetUrl,
+        email: user.email,
+        currentYear: new Date().getFullYear()
+      }
+    );
     
     res.json({ message: "If the email exists, a reset link will be sent" });
   } catch (error) {
@@ -194,6 +217,21 @@ router.post("/reset-password/:token", async (req: Request, res: Response): Promi
     // Update password
     user.password = password; // The User model should hash this before saving
     await user.save();
+    
+    // Send confirmation email
+    const mailgunClient = MailgunClient.getInstance();
+    const loginUrl = `${process.env.CLIENT_URL}/auth/signin`;
+    
+    await mailgunClient.sendEmailWithTemplate(
+      [user.email],
+      'Password Reset Successful',
+      'password-reset-confirmation',
+      {
+        loginUrl,
+        email: user.email,
+        currentYear: new Date().getFullYear()
+      }
+    );
     
     res.json({ message: "Password has been reset successfully" });
   } catch (error) {

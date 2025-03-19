@@ -89,7 +89,7 @@ export default function Page() {
             <Checkbox name="remember" size="sm">
               Remember me
             </Checkbox>
-            <Link className="text-default-500" href="/auth/forgot_passord" size="sm">
+            <Link className="text-default-500" href="/auth/forgot_password" size="sm">
               Forgot password?
             </Link>
           </div>
