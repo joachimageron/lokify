@@ -6,13 +6,12 @@ import { Icon } from "@iconify/react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/providers/AuthProvider";
 
+
 export default function Page() {
   const [isVisible, setIsVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
   const router = useRouter();
   const {user, login, isLoading: authLoading} = useAuth();
-  
-  console.log("User:", user);
 
   const toggleVisibility = () => setIsVisible(!isVisible);
   
@@ -34,7 +33,7 @@ export default function Page() {
       // Utilise la fonction login du contexte d'authentification
       const loginData = await login({ email, password });
       console.log("Login data:", loginData);
-      
+
       // Redirection après la connexion réussie
       // router.push("/dashboard"); // ou toute autre page après la connexion
     } catch (error) {
@@ -45,25 +44,18 @@ export default function Page() {
     }
   };
   
+  // Defining page's content
   return (
-    <div className="flex h-[90vh] w-full items-center justify-center">
+    <main className="flex flex-col items-center justify-center py-[105px] px-4 min-h-screen bg-home-img">
       <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-large font-medium">Sign in to your account</h1>
-          <p className="text-small text-default-500">to continue to BypolarMedia</p>
+        <div className="flex flex-col">
+          <h1 className="text-large font-medium">Connectez-vous à votre compte</h1>
+          <p className="text-small text-default-500">pour accéder à la réservation de casiers</p>
         </div>
         
         <Form className="flex flex-col gap-3" validationBehavior="native" onSubmit={handleSubmit}>
-          <Input
-            isRequired
-            label="Email Address"
-            name="email"
-            placeholder="Enter your email"
-            type="email"
-            variant="bordered"
-          />
-          <Input
-            isRequired
+          <Input isRequired label="Adresse mail" name="email" placeholder="Entrez votre adresse mail" type="email" variant="bordered"/>
+          <Input isRequired label="Mot de passe" name="password" placeholder="Entrez votre mot de passe" type={isVisible ? "text" : "password"} variant="bordered"
             endContent={
               <button type="button" onClick={toggleVisibility}>
                 {isVisible ? (
@@ -79,57 +71,31 @@ export default function Page() {
                 )}
               </button>
             }
-            label="Password"
-            name="password"
-            placeholder="Enter your password"
-            type={isVisible ? "text" : "password"}
-            variant="bordered"
           />
           <div className="flex w-full items-center justify-between px-1 py-2">
-            <Checkbox name="remember" size="sm">
-              Remember me
-            </Checkbox>
-            <Link className="text-default-500" href="/auth/forgot_password" size="sm">
-              Forgot password?
-            </Link>
+            <Checkbox name="remember" size="sm">Se souvenir de moi</Checkbox>
+            <Link className="text-blue-500" href="/auth/forgot_password" size="sm">Mot de passe oublié ?</Link>
           </div>
-          <Button 
-            isLoading={loading || authLoading} 
-            className="w-full" 
-            color="primary" 
-            type="submit"
-          >
-            Sign In
-          </Button>
+          <Button isLoading={loading} className="w-full" color="primary" type="submit">Je me connecte</Button>
         </Form>
-        {/* <div className="flex items-center gap-4 py-2">
+        <div className="flex items-center gap-4 py-2">
           <Divider className="flex-1" />
-          <p className="shrink-0 text-tiny text-default-500">OR</p>
+          <p className="shrink-0 text-tiny text-default-500">OU</p>
           <Divider className="flex-1" />
         </div>
         <div className="flex flex-col gap-2">
-          <Button
-            startContent={<Icon icon="flat-color-icons:google" width={24} />}
-            variant="bordered"
-            onPress={() => console.log("Google todo")}
-          >
-            Continue with Google
+          <Button startContent={<Icon icon="flat-color-icons:google" width={24} />} variant="bordered" onPress={() => console.log("Google todo")}>
+            Me connecter avec Google
           </Button>
-          <Button
-            startContent={<Icon className="text-default-500" icon="fe:github" width={24} />}
-            variant="bordered"
-            onPress={() => console.log("Github todo")}
-          >
-            Continue with Github
+          <Button startContent={<Icon className="text-default-500" icon="fe:github" width={24} />} variant="bordered" onPress={() => console.log("Github todo")}>
+            Me connecter avec Github
           </Button>
-        </div> */}
+        </div>
         <p className="text-center text-small">
-          Need to create an account ?&nbsp;
-          <Link href="/auth/register" size="sm">
-            Register
-          </Link>
+          Vous n'avez pas encore de compte ?<br></br>
+          <Link href="/auth/register" size="sm">Je crée mon compte</Link>
         </p>
       </div>
-    </div>
+    </main>
   );
 }

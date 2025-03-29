@@ -2,17 +2,48 @@
 import { Button } from "@heroui/react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/providers/AuthProvider";
+import { LockClosedIcon, ClockIcon, BellIcon } from "@heroicons/react/24/solid";
 
+// Defining the Lockify's features (displayed in page's content)
+const features = [
+  { icon: LockClosedIcon, title: "Sécurisé", description: "Vos affaires restent en sécurité 24/7." },
+  { icon: ClockIcon, title: "Flexible", description: "Choisissez la taille et réservez pour la durée qui vous convient." },
+  { icon: BellIcon, title: "Notifications", description: "Recevez un rappel avant expiration." },
+];
+
+// Defining the home page's content
 export default function Home() {
   const router = useRouter();
   const {logout} = useAuth();
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center">
-        <Button color="primary" onPress={()=> router.push('/auth/signin')}>go to signin in</Button>
-        <Button color="primary" onPress={()=> router.push('/auth/register')}>go to register</Button>
-        <Button color="primary" onPress={()=> logout()}>logout</Button>
+      <main className="flex flex-col items-center justify-center px-4 py-[105px] min-h-screen bg-home-img">
+
+        <div className="max-w-3xl text-center bg-white shadow-lg rounded-2xl p-8">
+          <h1 className="text-4xl font-bold text-gray-900 mb-4">Bienvenue sur Lockify !</h1>
+
+          <p className="text-gray-700 text-lg mb-8">
+            Réservez un casier en ligne en toute simplicité.<br></br>
+            Avec Lockify, sécurisez vos affaires sans stress et profitez de votre temps libre !
+          </p>
+
+          <ul className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-9">
+            {features.map((feature, index) => (
+                <li key={index} className="flex flex-col items-center">
+                  <feature.icon className="h-10 w-10 text-blue-500 mb-2" />
+                  <p className="font-semibold text-gray-800">{feature.title}</p>
+                  <p className="text-sm text-gray-600">{feature.description}</p>
+                </li>
+            ))}
+          </ul>
+
+          <Button className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 text-lg rounded-lg" onPress={() => router.push('/auth/signin')}>
+            Je réserve mon casier
+          </Button>
+
+        </div>
+
+        <Button className="absolute right-[40px] top-[20px] bg-blue-600 text-lg text-white" onPress={()=> logout()}>Déconnexion</Button>
       </main>
-    </div>
   );
 }

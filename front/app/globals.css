@@ -2,4 +2,56 @@
 @tailwind components;
 @tailwind utilities;
 
+.bg-home-img {
+  background-image: url("/images/bg-home.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
 
+.negative-shadow {
+  box-shadow: inset 0 0 15px gray;
+}
+
+.locker-emoji:before,
+.locker-emoji:after {
+  content: "";
+  position: absolute;
+  top: 60%;
+  translate: 0 -50%;
+  width: 8px;
+  height: 1px;
+  background-color: rgb(209 213 219 / var(--tw-bg-opacity, 1));
+}
+
+.locker-emoji:before {
+  right: 80%;
+}
+
+.locker-emoji:after {
+  left: 80%;
+}
+
+.locker-decoration:before,
+.locker-decoration:after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: inherit;
+  background-color: inherit;
+  border-radius: inherit;
+}
+
+.locker-decoration:before {
+  top: 7.5px;
+}
+
+.locker-decoration:after {
+  bottom: 7.5px;
+}
+
+button[disabled] {
+  opacity: 0.3;
+  pointer-events: none;
+}
