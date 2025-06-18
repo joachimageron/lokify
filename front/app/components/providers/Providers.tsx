@@ -10,12 +10,12 @@ export const Providers = ({
   return (
     <HeroUIProvider>
       <ReactQueryProvider>
+        <ToastProvider
+          placement="top-center"
+          toastOffset={15}
+          toastProps={{ variant: "flat" }}
+        />
         <AuthProvider>
-          <ToastProvider
-            placement="top-center"
-            toastOffset={15}
-            toastProps={{ variant: "flat" }}
-          />
           {children}
         </AuthProvider>
       </ReactQueryProvider>
