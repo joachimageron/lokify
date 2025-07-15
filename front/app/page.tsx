@@ -43,7 +43,9 @@ export default function Home() {
 
         </div>
 
-        <Button className="absolute right-[40px] top-[20px] bg-blue-600 text-lg text-white" onPress={()=> logout()}>Déconnexion</Button>
+        <Button className="absolute right-[180px] top-[20px] bg-blue-600 text-lg text-white" onPress={()=> logout()}>Mon compte</Button>
+
+        <Button className="absolute right-[30px] top-[20px] bg-blue-600 text-lg text-white" onPress={()=> logout()}>Déconnexion</Button>
       </main>
   );
 }
