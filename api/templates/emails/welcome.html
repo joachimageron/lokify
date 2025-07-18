@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,18 +14,22 @@
       margin: 0 auto;
       padding: 20px;
     }
+
     .header {
       text-align: center;
       margin-bottom: 30px;
     }
+
     .logo {
       max-width: 150px;
       margin-bottom: 20px;
     }
+
     h1 {
       color: #4A6FFF;
       margin-bottom: 20px;
     }
+
     .button {
       display: inline-block;
       background-color: #4A6FFF;
@@ -35,6 +40,7 @@
       margin: 20px 0;
       font-weight: bold;
     }
+
     .footer {
       margin-top: 30px;
       font-size: 12px;
@@ -43,9 +49,11 @@
       border-top: 1px solid #eee;
       padding-top: 20px;
     }
+
     .social-links {
       margin: 15px 0;
     }
+
     .social-links a {
       display: inline-block;
       margin: 0 10px;
@@ -54,26 +62,31 @@
     }
   </style>
 </head>
+
 <body>
   <div class="header">
     <!-- If you have a logo, uncomment this and add your logo path -->
     <!-- <img src="{{logoUrl}}" alt="Lokify" class="logo"> -->
     <h1>Welcome to Lokify!</h1>
   </div>
-  
-  <p>Hello {{email}},</p>
-  
-  <p>Thank you for joining Lokify! We're thrilled to have you on board. Your account has been successfully created, and you're now ready to start using our platform.</p>
-  
+
+  <p>Bonjour {{email}},</p>
+
+  <p>Merci d'avoir rejoint Lokify ! Nous sommes ravis de vous compter parmi nous. Votre compte a été créé avec succès et
+    vous
+    pouvez désormais utiliser notre plateforme.</p>
+
   <div style="text-align: center;">
-    <a href="{{dashboardUrl}}" class="button">Go to Your Dashboard</a>
+    <a href="http://localhost:3000/lockers/reservation" class="button">Réserver un casier</a>
+    <!-- <a href="{{dashboardUrl}}" class="button">Aller au dashboard</a> -->
   </div>
-  
-  <p>If you have any questions or need assistance, feel free to reply to this email or visit our help center.</p>
-  
-  <p>Happy exploring!</p>
+
+  <p>Si vous avez des questions ou avez besoin d'aide, n'hésitez pas à répondre à cet e-mail ou à visiter notre centre
+    d'aide.</p>
+
+  <p>Bonne exploration !</p>
   <p>The Lokify Team</p>
-  
+
   <div class="footer">
     <div class="social-links">
       <!-- Add your actual social media links here -->
@@ -85,4 +98,5 @@
     <p>This email was sent to {{email}} because you signed up for a Lokify account.</p>
   </div>
 </body>
+
 </html>

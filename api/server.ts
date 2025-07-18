@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import connection from "./config/database";
 import lockersRouter from "./routes/lockers";
 import authRouter from "./routes/auth";
+import confirmationRouter from "./routes/confirmation";
 import 'pretty-error/start';
 import fs from 'fs';
 import path from 'path';
@@ -43,6 +44,7 @@ app.use(cors({
 
 app.use("/api/lockers", lockersRouter);
 app.use("/api/auth", authRouter);
+app.use("/api", confirmationRouter);
 
 app.get("/", (req, res) => {
   res.send(JSON.stringify({ message: "Hello World" }));

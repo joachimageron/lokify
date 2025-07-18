@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,18 +14,22 @@
       margin: 0 auto;
       padding: 20px;
     }
+
     .header {
       text-align: center;
       margin-bottom: 30px;
     }
+
     .logo {
       max-width: 150px;
       margin-bottom: 20px;
     }
+
     h1 {
       color: #4A6FFF;
       margin-bottom: 20px;
     }
+
     .button {
       display: inline-block;
       background-color: #4A6FFF;
@@ -35,6 +40,7 @@
       margin: 20px 0;
       font-weight: bold;
     }
+
     .footer {
       margin-top: 30px;
       font-size: 12px;
@@ -43,28 +49,33 @@
     }
   </style>
 </head>
+
 <body>
   <div class="header">
     <!-- <img src="{{logoUrl}}" alt="Lokify" class="logo"> -->
     <h1>Welcome to Lokify!</h1>
   </div>
-  
+
   <p>Hello,</p>
-  
-  <p>Thank you for creating an account with Lokify. To complete your registration and verify your email address, please click the button below:</p>
-  
+
+  <p>Merci d'avoir créé un compte Lokify. Pour finaliser votre inscription et vérifier votre adresse e-mail, veuillez
+    cliquer
+    sur le bouton ci-dessous :</p>
+
   <div style="text-align: center;">
-    <a href="{{confirmUrl}}" class="button">Confirm My Email</a>
+    <a href="{{confirmUrl}}" class="button">Confirmer mon mail</a>
   </div>
-  
-  <p>If you didn't create an account with Lokify, you can safely ignore this email.</p>
-  
-  <p>Alternatively, you can copy and paste the following URL into your browser:</p>
+
+  <p>Si vous n'avez pas créé de compte avec Lokify, vous pouvez ignorer cet e-mail en toute sécurité.</p>
+
+  <p style="display:flex; flex-wrap: wrap;">Sinon vous pouvez copier et coller l'URL suivante dans votre navigateur :
+  </p>
   <p>{{confirmUrl}}</p>
-  
+
   <div class="footer">
     <p>&copy; {{currentYear}} Lokify. All rights reserved.</p>
     <p>This email was sent to {{email}}</p>
   </div>
 </body>
+
 </html>
