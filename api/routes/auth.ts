@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
 import MailgunClient from '../utils/mailgunClient';
+import MailClient from '../utils/mailClient';
 
   const router = express.Router();
 
@@ -37,15 +38,15 @@ router.post("/register", async (req: Request, res: Response): Promise<any>=> {
 
     // Send welcome email
     try {
-      const mailgunClient = MailgunClient.getInstance();
+      const mailClient = MailClient.getInstance();
       const verificationSecret = process.env.JWT_SECRET + user.password;
       const verificationToken = jwt.sign({ userId: user.id }, verificationSecret, { expiresIn: "7d" });
       const verificationUrl = `${process.env.CLIENT_URL}/auth/verify-email/${verificationToken}`;
       
-      await mailgunClient.sendEmailWithTemplate(
+      await mailClient.sendEmailWithTemplate(
         [user.email],
-        'Please Verify Your Email',
-        'email-confirmation',
+        'Veuillez vérifier votre email',
+        'email-confirmation', 
         {
           confirmUrl: verificationUrl,
           email: user.email,
@@ -53,7 +54,6 @@ router.post("/register", async (req: Request, res: Response): Promise<any>=> {
         }
       );
     } catch (emailError) {
-      // Log email error but don't fail registration
       console.error("Failed to send verification email:", emailError);
     }
 
@@ -165,15 +165,15 @@ router.post("/forgot-password", async (req: Request, res: Response): Promise<any
     // Create reset URL
     const resetUrl = `${process.env.CLIENT_URL}/auth/forgot_password/${token}`;
 
-    // Use the Mailgun singleton to send email with template
-    const mailgunClient = MailgunClient.getInstance();
-    
-    await mailgunClient.sendEmailWithTemplate(
+    const mailClient = MailClient.getInstance();
+
+    await mailClient.sendEmailWithTemplate(
       [user.email],
       'Password Reset Link',
-      'password-reset',
+      'password-reset', // ton template doit s'appeler password-reset.html
       {
         resetUrl,
+        loginUrl: `${process.env.CLIENT_URL}/auth/signin`, // pour le bouton "login" dans ton template
         email: user.email,
         currentYear: new Date().getFullYear()
       }
@@ -332,6 +332,23 @@ router.get("/verify-email/:token", async (req: Request, res: Response): Promise<
     // Mark email as verified
     user.emailVerified = true;
     await user.save();
+
+    try {
+      const mailClient = MailClient.getInstance();
+      await mailClient.sendEmailWithTemplate(
+        [user.email],
+        "Bienvenue sur Lokify",
+        "welcome", // ton template /templates/emails/welcome.html
+        {
+          email: user.email,
+          dashboardUrl: `${process.env.CLIENT_URL}/dashboard`,
+          currentYear: new Date().getFullYear(),
+        }
+      );
+    } catch (mailErr) {
+      console.error("Erreur lors de l'envoi du mail de bienvenue :", mailErr);
+      // Ce n'est pas bloquant pour la validation de l'email !
+    }
     
     res.json({ message: "Email verified successfully" });
     
