@@ -67,6 +67,7 @@ const LockerForm: React.FC<LockerFormProps> = ({
     <form onSubmit={handleSubmit} className="grid gap-2">
       <Input
         name="number"
+        label="Number"
         placeholder="Number"
         value={locker.number}
         onChange={handleChange}
@@ -74,13 +75,19 @@ const LockerForm: React.FC<LockerFormProps> = ({
       />
       <Input
         name="price"
+        label="Price"
         placeholder="Price"
         value={locker.price}
         onChange={handleChange}
         required
       />
 
-      <Select name="size" value={locker.size} onChange={handleChange as any}>
+      <Select
+        name="size"
+        label="Size"
+        value={locker.size}
+        onChange={handleChange as any}
+      >
         {["small", "medium", "large"].map((size) => (
           <SelectItem key={size}>{size}</SelectItem>
         ))}
@@ -88,6 +95,7 @@ const LockerForm: React.FC<LockerFormProps> = ({
 
       <Select
         name="status"
+        label="Status"
         value={locker.status}
         onChange={handleChange as any}
       >
