@@ -19,7 +19,7 @@ export default function Home() {
   const { user } = useAuth();
 
   return (
-    <main className="flex flex-col items-center justify-center px-4 py-[105px] min-h-screen bg-home-img">
+    <main className="flex flex-col items-center justify-center mb-[20px] px-4 py-[140px] lg:py-[105px] min-h-screen bg-home-img">
 
       <div className="max-w-3xl text-center bg-white shadow-lg rounded-2xl p-8">
         <h1 className="text-4xl font-bold text-gray-900 mb-4">Bienvenue sur Lockify !</h1>

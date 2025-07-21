@@ -5,6 +5,7 @@ import cookieParser from "cookie-parser";
 import connection from "./config/database";
 import lockersRouter from "./routes/lockers";
 import authRouter from "./routes/auth";
+import usersRouter from "./routes/users";
 import LockerScheduler from "./services/lockerScheduler";
 import "pretty-error/start";
 import fs from "fs";
@@ -46,6 +47,7 @@ app.use(
 
 app.use("/api/lockers", lockersRouter);
 app.use("/api/auth", authRouter);
+app.use("/api/users", usersRouter);
 
 app.get("/", (req, res) => {
   res.send(JSON.stringify({ message: "Hello World" }));
