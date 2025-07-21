@@ -261,23 +261,12 @@ router.post(
 // Send verification email
 router.post(
   "/send-verification-email",
+  auth,
   async (req: Request, res: Response): Promise<any> => {
     try {
-      const token = req.cookies.token;
-      if (!token) {
-        return res.status(401).json({ message: "Not authenticated" });
-      }
-
-      const secret = process.env.JWT_SECRET;
-      if (!secret) {
-        return res.status(500).json({ message: "Server configuration error" });
-      }
-
-      const decoded = jwt.verify(token, secret) as { userId: string };
-
-      const user = await User.findById(decoded.userId);
+      const user = await User.findById(req.userId);
       if (!user) {
-        return res.status(401).json({ message: "Not authenticated" });
+        return res.status(401).json({ message: "User not found" });
       }
 
       // If already verified, no need to send
