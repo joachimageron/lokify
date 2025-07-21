@@ -5,9 +5,10 @@ import cookieParser from "cookie-parser";
 import connection from "./config/database";
 import lockersRouter from "./routes/lockers";
 import authRouter from "./routes/auth";
-import 'pretty-error/start';
-import fs from 'fs';
-import path from 'path';
+import LockerScheduler from "./services/lockerScheduler";
+import "pretty-error/start";
+import fs from "fs";
+import path from "path";
 
 // Load base environment variables first
 dotenv.config({ path: ".env" });
@@ -53,4 +54,8 @@ app.get("/", (req, res) => {
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`server listening on port ${PORT}`);
+
+  // Démarrer le planificateur de casiers
+  const scheduler = LockerScheduler.getInstance();
+  scheduler.start();
 });
