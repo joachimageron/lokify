@@ -237,6 +237,7 @@ router.post("/reset-password/:token", async (req: Request, res: Response): Promi
     res.json({ message: "Password has been reset successfully" });
   } catch (error) {
     console.error("Password reset error:", error);
+    console.log(error);
     res.status(500).json({ message: "An error occurred during the password reset process" });
   }
 });
