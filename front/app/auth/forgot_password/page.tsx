@@ -69,26 +69,25 @@ export default function Page() {
   };
 
   return (
-      <main className="flex flex-col items-center justify-center py-[105px] px-4 min-h-screen bg-home-img">
-          <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">
-              <div className="flex flex-col">
-                  <h1 className="text-large font-medium">Vous avez oublié votre mot de passe ?</h1>
-                  <p className="text-small text-default-500">Ca peut arriver, pas de problème ! Saisissez ici votre
-                      adresse mail et nous vous envoyons un lien pour le réinitialiser.</p>
-              </div>
+    <main className="flex flex-col items-center justify-center py-[105px] px-4 min-h-screen bg-home-img">
+      <div className="flex w-full max-w-sm flex-col gap-4 rounded-large bg-content1 px-8 py-6 shadow-small">
+        <div className="flex flex-col">
+          <h1 className="text-large font-medium">Forgot your password ?</h1>
+          <p className="text-small text-default-500">It can happen, no problem! Enter your
+            e-mail address here and we'll send you a link to reset it.</p>
+        </div>
 
-              <Form className="flex flex-col gap-3" validationBehavior="native" onSubmit={handleSubmit}>
-                  <Input isRequired label="Adresse mail" name="email" placeholder="Entrez votre adresse mail"
-                         type="email" variant="bordered" disabled={forgotPasswordMutation.isPending}/>
-                  <Button isLoading={forgotPasswordMutation.isPending} className="w-full" color="primary" type="submit">Recevoir
-                      mon lien de réinitialisation</Button>
-              </Form>
+        <Form className="flex flex-col gap-3" validationBehavior="native" onSubmit={handleSubmit}>
+          <Input isRequired label="E-mail address" name="email" placeholder="Enter your e-mail address"
+            type="email" variant="bordered" disabled={forgotPasswordMutation.isPending} />
+          <Button isLoading={forgotPasswordMutation.isPending} className="w-full" color="primary" type="submit">Receive my reset link</Button>
+        </Form>
 
-              <p className="text-center text-small">
-                  La mémoire vous est revenue ?&nbsp;<br></br>
-                  <Link href="/auth/signin" size="sm">Je retourne à la page de connexion</Link>
-              </p>
-          </div>
-      </main>
+        <p className="text-center text-small">
+          Has your memory returned ?&nbsp;<br></br>
+          <Link href="/auth/signin" size="sm">I return to the login page</Link>
+        </p>
+      </div>
+    </main>
   );
 }

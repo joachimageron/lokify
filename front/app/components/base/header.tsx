@@ -26,9 +26,9 @@ export default function Header() {
 
             {user && (
                 <div className="flex items-center gap-4">
-                    <span className="text-black">Bonjour {user.email}</span>
+                    <span className="text-black">Hello {user.email}</span>
                     <Button className="bg-blue-600 text-white" onPress={logout}>
-                        Déconnexion
+                        Log out
                     </Button>
                 </div>
             )}

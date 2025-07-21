@@ -49,7 +49,7 @@ router.post("/register", async (req: Request, res: Response): Promise<any> => {
 
       await mailClient.sendEmailWithTemplate(
         [user.email],
-        "Veuillez vérifier votre email",
+        "Please check your email",
         "email-confirmation",
         {
           confirmUrl: verificationUrl,
@@ -341,7 +341,7 @@ router.get(
       const secret = process.env.JWT_SECRET + user.password;
       try {
         jwt.verify(token, secret);
-      } catch  {
+      } catch {
         return res
           .status(400)
           .json({ message: "Invalid or expired verification token" });

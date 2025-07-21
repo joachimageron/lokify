@@ -9,13 +9,12 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const pathname = usePathname(); // Récupération du pathname actuel
-  
-  console.log("Current pathname:", pathname);
-  
+
+
   useEffect(() => {
     // Si on n'est pas sur la page de vérification d'email et que l'utilisateur est connecté
     if (user && !isLoading && !pathname.includes('/auth/verify-email/')) {
-      router.push("/");
+      router.push("/lockers/reservation");
     }
   }, [user, isLoading, router, pathname]);
 

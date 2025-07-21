@@ -27,19 +27,12 @@ type Locker = {
   reservationEnd?: string | null;
 };
 
-type LockerFormProps = {
+const LockerForm: React.FC<{
   selected?: Locker;
   onSave: (locker: Locker) => Promise<void>;
   onCancel: () => void;
   existingLockers: Locker[];
-};
-
-const LockerForm: React.FC<LockerFormProps> = ({
-  selected,
-  onSave,
-  onCancel,
-  existingLockers,
-}) => {
+}> = ({ selected, onSave, onCancel, existingLockers }) => {
   const [locker, setLocker] = useState<Locker>(
     selected || { number: "", size: "small", status: "available", price: "" }
   );
@@ -94,45 +87,15 @@ const LockerForm: React.FC<LockerFormProps> = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="grid gap-2">
-      <Input
-        name="number"
-        label="Number"
-        value={locker.number}
-        onChange={handleChange}
-        required
-        isInvalid={!!errors.number}
-        errorMessage={errors.number}
-      />
-      <Input
-        name="price"
-        label="Price"
-        value={locker.price}
-        onChange={handleChange}
-        required
-        isInvalid={!!errors.price}
-        errorMessage={errors.price}
-      />
-      <Select
-        name="size"
-        label="Size"
-        selectedKeys={[locker.size]}
-        isInvalid={!!errors.size}
-        errorMessage={errors.size}
-        onSelectionChange={(keys) =>
-          handleSelectChange("size", Array.from(keys)[0] as string)
-        }
-      >
-        {["small", "medium", "large"].map((size) => (
-          <SelectItem key={size}>{size}</SelectItem>
-        ))}
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <Input name="number" label="Locker Number" value={locker.number} onChange={handleChange} isInvalid={!!errors.number} errorMessage={errors.number} />
+      <Input name="price" label="Price (€)" value={locker.price} onChange={handleChange} isInvalid={!!errors.price} errorMessage={errors.price} />
+      <Select label="Size" selectedKeys={[locker.size]} onSelectionChange={(keys) => handleSelectChange("size", Array.from(keys)[0] as string)} isInvalid={!!errors.size} errorMessage={errors.size}>
+        {["small", "medium", "large"].map((size) => <SelectItem key={size}>{size}</SelectItem>)}
       </Select>
-
-      <div className="flex gap-2 mt-2">
+      <div className="flex justify-end gap-2">
         <Button type="submit">Save</Button>
-        <Button type="button" variant="bordered" onPress={onCancel}>
-          Cancel
-        </Button>
+        <Button type="button" variant="bordered" onPress={onCancel}>Cancel</Button>
       </div>
     </form>
   );
@@ -150,17 +113,13 @@ export default function LockerPage() {
     setLockers(data);
   };
 
-  useEffect(() => {
-    fetchLockers();
-  }, []);
+  useEffect(() => { fetchLockers(); }, []);
 
   useEffect(() => {
     const fetchUserEmail = async () => {
       if (viewing?.reservedBy) {
         try {
-          const res = await fetch(`${API_URL}/users/${viewing.reservedBy}`, {
-            credentials: "include",
-          });
+          const res = await fetch(`${API_URL}/users/${viewing.reservedBy}`, { credentials: "include" });
           if (res.ok) {
             const user = await res.json();
             setViewing((prev) => prev && { ...prev, reservedByEmail: user.email });
@@ -177,9 +136,7 @@ export default function LockerPage() {
 
   const handleSave = async (locker: Locker) => {
     const method = locker._id ? "PUT" : "POST";
-    const endpoint = locker._id
-      ? `${API_URL}/lockers/${locker._id}`
-      : `${API_URL}/lockers`;
+    const endpoint = locker._id ? `${API_URL}/lockers/${locker._id}` : `${API_URL}/lockers`;
 
     const res = await fetch(endpoint, {
       method,
@@ -200,55 +157,40 @@ export default function LockerPage() {
 
   const confirmDelete = async () => {
     if (!deleting?._id) return;
-    await fetch(`${API_URL}/lockers/${deleting._id}`, {
-      method: "DELETE",
-      credentials: "include",
-    });
+    await fetch(`${API_URL}/lockers/${deleting._id}`, { method: "DELETE", credentials: "include" });
     setDeleting(null);
     fetchLockers();
   };
 
   const formatDate = (dateStr?: string | null) => {
     if (!dateStr) return "N/A";
-    return new Date(dateStr).toLocaleString("fr-FR", {
-      dateStyle: "short",
-      timeStyle: "short",
-    });
+    return new Date(dateStr).toLocaleString("fr-FR", { dateStyle: "short", timeStyle: "short" });
   };
 
   return (
-    <div className="p-6 pt-[100px] max-w-4xl mx-auto">
-      <h1 className="text-2xl font-bold mb-4">Lockers Administration Panel</h1>
+    <div className="p-6 pt-[100px] max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-6 text-center">Lockers Administration Panel</h1>
 
-      <Button
-        className="mb-4"
-        onPress={() =>
-          setEditing({ number: "", size: "small", status: "available", price: "" })
-        }
-      >
-        + Add New Locker
-      </Button>
+      <div className="flex justify-center mb-6">
+        <Button onPress={() => setEditing({ number: "", size: "small", status: "available", price: "" })}>
+          + Add New Locker
+        </Button>
+      </div>
 
-      <div className="grid gap-4">
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {lockers.map((locker) => (
-          <Card key={locker._id} className="p-2">
-            <CardBody className="grid grid-cols-2 md:grid-cols-4 gap-2 items-center">
+          <Card key={locker._id} className="shadow rounded-lg p-4">
+            <CardBody className="flex flex-col gap-2">
               <div>
                 <p><strong>Number:</strong> {locker.number}</p>
                 <p><strong>Size:</strong> {locker.size}</p>
-              </div>
-              <div>
                 <p><strong>Status:</strong> {locker.status}</p>
                 <p><strong>Price:</strong> {locker.price}€</p>
               </div>
-              <div className="col-span-2 flex gap-2 justify-end">
-                <Button variant="solid" onPress={() => setViewing(locker)}>
-                  View
-                </Button>
-                <Button onPress={() => setEditing(locker)}>Edit</Button>
-                <Button variant="faded" onPress={() => setDeleting(locker)}>
-                  Delete
-                </Button>
+              <div className="flex flex-wrap gap-2 justify-center mt-2">
+                <Button size="sm" onPress={() => setViewing(locker)}>View</Button>
+                <Button size="sm" variant="ghost" onPress={() => setEditing(locker)}>Edit</Button>
+                <Button size="sm" variant="bordered" color="danger" onPress={() => setDeleting(locker)}>Delete</Button>
               </div>
             </CardBody>
           </Card>
@@ -261,7 +203,7 @@ export default function LockerPage() {
           {(onClose) => (
             <>
               <ModalHeader>Locker Details</ModalHeader>
-              <ModalBody className="text-sm">
+              <ModalBody className="text-sm grid gap-1">
                 {viewing && (
                   <>
                     <p><strong>Number:</strong> {viewing.number}</p>
@@ -289,12 +231,7 @@ export default function LockerPage() {
             <>
               <ModalHeader>{editing?._id ? "Edit Locker" : "Create Locker"}</ModalHeader>
               <ModalBody>
-                <LockerForm
-                  selected={editing!}
-                  onSave={handleSave}
-                  onCancel={() => setEditing(null)}
-                  existingLockers={lockers}
-                />
+                <LockerForm selected={editing!} onSave={handleSave} onCancel={() => setEditing(null)} existingLockers={lockers} />
               </ModalBody>
             </>
           )}
@@ -308,7 +245,7 @@ export default function LockerPage() {
             <>
               <ModalHeader>Confirm Delete</ModalHeader>
               <ModalBody>
-                <p>Are you sure you want to delete locker <strong>{deleting?.number}</strong>?</p>
+                <p> Are you sure you want to delete locker <strong>{deleting?.number}</strong>?</p>
               </ModalBody>
               <ModalFooter>
                 <Button variant="bordered" onPress={onClose}>Cancel</Button>
