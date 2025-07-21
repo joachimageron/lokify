@@ -1,17 +1,15 @@
 "use client";
 
 import React from "react";
-import { Button, Input, Link, Form, Divider, Checkbox, addToast } from "@heroui/react";
+import { Button, Input, Link, Form, Checkbox } from "@heroui/react";
 import { Icon } from "@iconify/react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/app/components/providers/AuthProvider";
 
 
 export default function Page() {
   const [isVisible, setIsVisible] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
-  const router = useRouter();
-  const { user, login, isLoading: authLoading } = useAuth();
+  const { login } = useAuth();
 
   const toggleVisibility = () => setIsVisible(!isVisible);
 
@@ -78,19 +76,6 @@ export default function Page() {
           </div>
           <Button isLoading={loading} className="w-full" color="primary" type="submit">Je me connecte</Button>
         </Form>
-        <div className="flex items-center gap-4 py-2">
-          <Divider className="flex-1" />
-          <p className="shrink-0 text-tiny text-default-500">OU</p>
-          <Divider className="flex-1" />
-        </div>
-        <div className="flex flex-col gap-2">
-          <Button startContent={<Icon icon="flat-color-icons:google" width={24} />} variant="bordered" onPress={() => console.log("Google todo")}>
-            Me connecter avec Google
-          </Button>
-          <Button startContent={<Icon className="text-default-500" icon="fe:github" width={24} />} variant="bordered" onPress={() => console.log("Github todo")}>
-            Me connecter avec Github
-          </Button>
-        </div>
         <p className="text-center text-small">
           Vous n'avez pas encore de compte ?<br></br>
           <Link href="/auth/register" size="sm">Je crée mon compte</Link>
