@@ -222,7 +222,7 @@ router.post(
       const secret = process.env.JWT_SECRET + user.password;
       try {
         jwt.verify(token, secret);
-      } catch (error) {
+      } catch {
         return res.status(400).json({ message: "Invalid or expired token" });
       }
 
@@ -341,7 +341,7 @@ router.get(
       const secret = process.env.JWT_SECRET + user.password;
       try {
         jwt.verify(token, secret);
-      } catch (error) {
+      } catch  {
         return res
           .status(400)
           .json({ message: "Invalid or expired verification token" });

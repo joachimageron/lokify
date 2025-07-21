@@ -40,7 +40,7 @@ export const auth = (req: Request, res: Response, next: NextFunction): void => {
     const decoded = jwt.verify(token, secret) as JwtPayload;
     req.userId = decoded.userId;
     next();
-  } catch (error) {
+  } catch {
     res.status(401).json({ message: "Token is not valid" });
   }
 };
