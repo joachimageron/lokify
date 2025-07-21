@@ -1,7 +1,6 @@
 import express, { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User";
-import MailgunClient from '../utils/mailgunClient';
 import MailClient from '../utils/mailClient';
 
   const router = express.Router();
@@ -170,10 +169,10 @@ router.post("/forgot-password", async (req: Request, res: Response): Promise<any
     await mailClient.sendEmailWithTemplate(
       [user.email],
       'Password Reset Link',
-      'password-reset', // ton template doit s'appeler password-reset.html
+      'password-reset', 
       {
         resetUrl,
-        loginUrl: `${process.env.CLIENT_URL}/auth/signin`, // pour le bouton "login" dans ton template
+        loginUrl: `${process.env.CLIENT_URL}/auth/signin`,
         email: user.email,
         currentYear: new Date().getFullYear()
       }
@@ -220,14 +219,14 @@ router.post("/reset-password/:token", async (req: Request, res: Response): Promi
     user.password = password; // The User model should hash this before saving
     await user.save();
     
-    // Send confirmation email
-    const mailgunClient = MailgunClient.getInstance();
+    // Send confirmation email (via Mailtrap)
+    const mailClient = MailClient.getInstance();
     const loginUrl = `${process.env.CLIENT_URL}/auth/signin`;
     
-    await mailgunClient.sendEmailWithTemplate(
+    await mailClient.sendEmailWithTemplate(
       [user.email],
       'Password Reset Successful',
-      'password-reset-confirmation',
+      'password-reset-confirmation', // Nom du template dans /templates/emails/
       {
         loginUrl,
         email: user.email,
@@ -275,19 +274,19 @@ router.post("/send-verification-email", async (req: Request, res: Response): Pro
     const verificationUrl = `${process.env.CLIENT_URL}/auth/verify-email/${verificationToken}`;
     
     // Send the verification email
-    const mailgunClient = MailgunClient.getInstance();
-    
-    await mailgunClient.sendEmailWithTemplate(
+    const mailClient = MailClient.getInstance();
+
+    await mailClient.sendEmailWithTemplate(
       [user.email],
       'Please Verify Your Email',
-      'email-confirmation',
+      'email-confirmation', 
       {
         confirmUrl: verificationUrl,
         email: user.email,
         currentYear: new Date().getFullYear()
       }
     );
-    
+
     res.json({ message: "Verification email sent successfully" });
   } catch (error) {
     console.error("Email verification error:", error);
@@ -347,7 +346,6 @@ router.get("/verify-email/:token", async (req: Request, res: Response): Promise<
       );
     } catch (mailErr) {
       console.error("Erreur lors de l'envoi du mail de bienvenue :", mailErr);
-      // Ce n'est pas bloquant pour la validation de l'email !
     }
     
     res.json({ message: "Email verified successfully" });
