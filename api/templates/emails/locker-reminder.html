@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Rappel : Votre réservation de casier expire bientôt</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            color: #222;
+            background: #f8f8fa;
+            padding: 20px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .main-content {
+            background: #fff;
+            padding: 24px 20px;
+            border-radius: 10px;
+            box-shadow: 0 1px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .button {
+            display: inline-block;
+            margin-top: 20px;
+            background-color: #4A6FFF;
+            color: #fff !important;
+            text-decoration: none;
+            padding: 10px 28px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <h1>Rappel : votre réservation de casier expire bientôt</h1>
+    </div>
+    <div class="main-content">
+        <p>Bonjour {{name}},</p>
+        <p>
+            Ceci est un rappel automatique : votre réservation du casier n°<strong>{{lockerNumber}}</strong> se termine
+            dans <strong>24 heures</strong>, le <strong>{{endDate}}</strong>.
+        </p>
+        <p>
+            Pensez à venir récupérer vos affaires avant cette date. Après expiration, le casier sera automatiquement
+            libéré et pourra être attribué à un autre utilisateur.
+        </p>
+        <p>
+            Si besoin, vous pouvez prolonger votre réservation depuis votre espace client :
+        </p>
+        <div style="text-align: center;">
+            <a href="{{dashboardUrl}}" class="button">Gérer ma réservation</a>
+        </div>
+        <p style="margin-top: 28px;">
+            Merci d'utiliser Lokify !<br />
+            L'équipe Lokify
+        </p>
+    </div>
+    <div class="footer">
+        &copy; {{currentYear}} Lokify. Tous droits réservés.
+    </div>
+</body>
+
+</html>

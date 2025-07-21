@@ -10,7 +10,7 @@ import fs from 'fs';
 import path from 'path';
 
 // Load base environment variables first
-dotenv.config({ path: '.env' });
+dotenv.config({ path: ".env" });
 
 // Then load NODE_ENV specific variables
 if (process.env.NODE_ENV) {
@@ -24,7 +24,7 @@ if (process.env.NODE_ENV) {
 }
 
 // Finally, override with .env.local if it exists
-const localEnvPath = '.env.local';
+const localEnvPath = ".env.local";
 if (fs.existsSync(path.resolve(process.cwd(), localEnvPath))) {
   dotenv.config({ path: localEnvPath });
   console.log(`Loaded local environment overrides from ${localEnvPath}`);
@@ -36,10 +36,12 @@ const app: Application = express();
 
 app.use(express.json()); // Uncommented this line for JSON parsing
 app.use(cookieParser());
-app.use(cors({
-  origin: process.env.CLIENT_URL || 'http://localhost:3000',
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
+    credentials: true,
+  })
+);
 
 app.use("/api/lockers", lockersRouter);
 app.use("/api/auth", authRouter);
