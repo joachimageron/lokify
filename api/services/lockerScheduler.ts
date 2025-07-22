@@ -1,5 +1,6 @@
 import cron from "node-cron";
 import Locker from "../models/Locker";
+import MailClient from "../utils/mailClient";
 
 class LockerScheduler {
   private static instance: LockerScheduler;
@@ -20,14 +21,38 @@ class LockerScheduler {
   private async updateLockerStatuses(): Promise<void> {
     try {
       const now = new Date();
+      const in24hMs = now.getTime() + 24 * 60 * 60 * 1000;
+      const oneHour = 60 * 60 * 1000;
 
       // Trouver tous les casiers réservés dont la réservation a expiré
       const expiredLockers = await Locker.find({
         status: "reserved",
         reservationEnd: { $lt: now },
-      });
+      }).populate('reservedBy');
 
       if (expiredLockers.length > 0) {
+
+        for (const locker of expiredLockers) {
+          // On "force" TypeScript à comprendre que reservedBy est un user
+          const user = locker.reservedBy as { email?: string; name?: string };
+
+          if (user && user.email && locker.reservationEnd) {
+            await MailClient.getInstance().sendEmailWithTemplate(
+              [user.email],
+              "Votre réservation de casier est terminée",
+              "locker-expired",
+              {
+                name: user.name || user.email,
+                lockerNumber: locker.lockerNumber || locker.id,
+                endDate: locker.reservationEnd.toLocaleString("fr-FR"),
+                dashboardUrl: `${process.env.CLIENT_URL}/dashboard`,
+                currentYear: new Date().getFullYear(),
+              }
+            );
+            console.log(`[Mail] Envoyé à ${user.email} pour casier #${locker.lockerNumber || locker.id}`);
+          }
+        }
+
         // Marquer les casiers expirés comme disponibles
         await Locker.updateMany(
           {
@@ -49,6 +74,38 @@ class LockerScheduler {
             expiredLockers.length
           } casier(s) marqué(s) comme disponible(s) après expiration`
         );
+      }
+
+      const reminderLockers = await Locker.find({
+        status: "reserved",
+        reservationEnd: { 
+          $gte: new Date(in24hMs - oneHour),  // dans 23h à 25h
+          $lte: new Date(in24hMs + oneHour)
+        },
+        reminderSent: { $ne: true }
+      }).populate("reservedBy");
+
+      for (const locker of reminderLockers) {
+        const user = locker.reservedBy as { email?: string; name?: string };
+        if (user && user.email && locker.reservationEnd) {
+          await MailClient.getInstance().sendEmailWithTemplate(
+            [user.email],
+            "Rappel : votre réservation de casier expire dans 24h",
+            "locker-reminder",
+            {
+              name: user.name || user.email,
+              lockerNumber: locker.lockerNumber || locker.id,
+              endDate: locker.reservationEnd.toLocaleString("fr-FR"),
+              dashboardUrl: `${process.env.CLIENT_URL}/dashboard`,
+              currentYear: new Date().getFullYear(),
+            }
+          );
+
+          locker.reminderSent = true;
+          await locker.save();
+
+          console.log(`[MailRappel] Rappel J-1 envoyé à ${user.email} pour casier #${locker.lockerNumber || locker.id}`);
+        }
       }
 
       // Optionnel: Trouver les casiers avec le statut "expired" et les remettre à "available"
