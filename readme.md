@@ -17,7 +17,7 @@ Lokify est une plateforme complète permettant aux utilisateurs de réserver des
 
 ### 📦 Gestion des casiers
 
-- Casiers de différentes tailles (S, M, L)
+- Casiers de différentes tailles (Petit, Moyen, Grand)
 - Visualisation en temps réel de la disponibilité
 - Réservation avec date et heure
 - Notifications par email
@@ -171,23 +171,13 @@ pnpm lint     # Linting du code
 
 - `GET /api/lockers` - Liste des casiers disponibles
 
-## 🤝 Contribution
-
-Les contributions sont les bienvenues ! Veuillez :
-
-1. Fork le projet
-2. Créer une branche pour votre fonctionnalité
-3. Commiter vos changements
-4. Pousser vers la branche
-5. Ouvrir une Pull Request
-
-## 📄 Licence
-
-Ce projet est sous licence MIT.
 
 ## 👥 Équipe
 
-- **Joachim Ageron** - Développeur principal
+- **Joachim Ageron** 
+- **Lisa Michallon** 
+- **Hugo Duperthuy**
+- **Louis Cauvet** 
 
 ## 📞 Support
 
