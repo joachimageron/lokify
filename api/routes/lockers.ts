@@ -5,8 +5,6 @@ import { auth } from "../middleware/auth";
 
 const router = express.Router();
 
-router.use(auth);
-
 router.get("/", async (_req: Request, res: Response): Promise<void> => {
   try {
     const lockers = await Locker.find();
@@ -67,23 +65,21 @@ router.delete("/:id", async (req: Request, res: Response): Promise<void> => {
   }
 });
 
-// Route pour déclencher manuellement la mise à jour des statuts (utile pour les tests)
-router.post(
-  "/update-statuses",
-  async (req: Request, res: Response): Promise<void> => {
-    try {
-      const scheduler = LockerScheduler.getInstance();
-      await scheduler.runManualUpdate();
-      res
-        .status(200)
-        .json({ message: "Mise à jour des statuts effectuée avec succès" });
-    } catch (error) {
-      res.status(500).json({ error: (error as Error).message });
-    }
+
+router.post("/update-statuses", async (req: Request, res: Response): Promise<void> => {
+  try {
+    const scheduler = LockerScheduler.getInstance();
+    await scheduler.runManualUpdate();
+    res
+      .status(200)
+      .json({ message: "Mise à jour des statuts effectuée avec succès" });
+  } catch (error) {
+    res.status(500).json({ error: (error as Error).message });
   }
+}
 );
 
-// Route pour vérifier le statut du planificateur
+
 router.get("/scheduler/status", (req: Request, res: Response): void => {
   const scheduler = LockerScheduler.getInstance();
   res.status(200).json({

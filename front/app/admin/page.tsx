@@ -109,7 +109,10 @@ export default function LockerPage() {
 
   const fetchLockers = async () => {
     const res = await fetch(`${API_URL}/lockers`, { credentials: "include" });
+    console.log("Status de la réponse :", res.status);
+
     const data = await res.json();
+    console.log("Réponse JSON :", data);
     setLockers(data);
   };
 
